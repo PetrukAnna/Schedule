@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>lab2_6</title>
+    <style>
+        table {
+            width: 1320px;
+            /*height: 450px;*/
+            z-index: 2;
+            border-collapse: collapse;
+            border: 1px solid black;
+        }
+        td {
+            text-align: center;
+            width: 120px;
+            height: 20px;
+        }
+        tr:first-child {
+            background: #0905ff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #c9ddff;
+        }
+        tr:not(:first-child):hover {
+            background: #faf369;
+            cursor: pointer;
+        }
+        button {
+            display: none;
+        }
+        input {
+            outline: none;
+            border-radius: 2px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        input:invalid {
+            border-color: red;
+        }
+        input:valid {
+            border-color: green;
+        }
+        form:invalid>button {
+            display: none;
+        }
+        form:valid>button {
+            display: block;
+        }
+        th:after {
+            content: "";
+            position: absolute;
+            display: none;
+            background: rgba(250,243,105,0.5);
+            width: 120px;
+            height: 340px;
+            margin-left: -1px;
+            margin-top: 6px;
+            z-index: -1;
+        }
+        th:hover {
+            cursor: pointer;
+        }
+        th:hover:after {
+            display: block;
+        }
+        
+        .headers {
+            margin: 0px;
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+        .filters {
+            display: inline-block;
+            width: 99px;
+        }
+
+        input#weekdays:checked ~ table tr:not([data-date*="weekdays"]):not([data-first="1"]),
+        input#weekends:checked ~ table tr:not([data-date*="weekends"]):not([data-first="1"]),
+
+        input#famile-doctor:checked ~ table tr:not([data-speciality="famile-doctor"]):not([data-first="1"]),
+        input#surgeon:checked ~ table tr:not([data-speciality="surgeon"]):not([data-first="1"]),
+        input#neurologist:checked ~ table tr:not([data-speciality="neurologist"]):not([data-first="1"]),
+        input#dentist:checked ~ table tr:not([data-speciality="dentist"]):not([data-first="1"]),
+        input#speech-therapist:checked ~ table tr:not([data-speciality="speech-therapist"]):not([data-first="1"]),
+        input#otolaryngologist:checked ~ table tr:not([data-speciality="otolaryngologist"]):not([data-first="1"]),
+        input#pediatrist:checked ~ table tr:not([data-speciality="pediatrist"]):not([data-first="1"]),
+
+        input#_1:checked ~ table tr:not([data-floor="1"]):not([data-first="1"]),
+        input#_2:checked ~ table tr:not([data-floor="2"]):not([data-first="1"]),
+        input#_3:checked ~ table tr:not([data-floor="3"]):not([data-first="1"]),
+        input#_4:checked ~ table tr:not([data-floor="4"]):not([data-first="1"]),
+
+        input#first:checked ~ table tr:not([data-category="1"]):not([data-first="1"]),
+        input#second:checked ~ table tr:not([data-category="2"]):not([data-first="1"]),
+
+        input#before:checked ~ table tr:not([data-part-of-date="1"]):not([data-first="1"]),
+        input#after:checked ~ table tr:not([data-part-of-date="2"]):not([data-first="1"]){
+            display: none;
+        }
+
+        input[type="text"] {
+            position: absolute;
+            right: 30px;
+        }
+
+    </style>
+    <script>
+        window.addEventListener("load", function() {
+            var list = document.getElementById("speciality_search");
+            list.addEventListener("change", function() {
+                var tr = document.getElementsByTagName("tr");
+                for(var i = 1; i < tr.length; i++) {
+                    if (list.value == "") {
+                         tr[i].style.display = "table-row";
+                    } else {
+                        if(tr[i].getAttribute("data-name") != list.value) {
+                            tr[i].style.display = "none";
+                        } else if(tr[i].getAttribute("data-name") == list.value) {
+                            tr[i].style.display = "table-row";
+                        } 
+                    }
+                    
+                }
+            })
+        });
+    </script>
+</head>
+<body>
+    <input autocomplete="off" type="text" name="search" id="speciality_search" list="speciality_list">
+    <datalist id="speciality_list">
+        <option>Дайнега О.В.</option>
+        <option>Кротова Л.С.</option>   
+        <option>Хитрук О.О.</option>
+        <option>Скрицький І.В.</option>
+        <option>Зайцев Л.В.</option> 
+        <option>Коломієць А.П.</option>  
+        <option>Петренко А.В.</option>   
+        <option>Зубренко В.К.</option>   
+        <option>Ябленко К.В.</option>    
+        <option>Войтенко М.В.</option>
+        <option>Вільгаш Н.Р.</option>    
+        <option>Каплун Г.В.</option>
+        <option>Валенко Ш.Н.</option>
+        <option>Зайцева Г.В.</option>
+        <option>Оганян Г.Н.</option>
+    </datalist>
+
+    <div class="headers">Спеціальність:</div class="headers"> 
+    <div class="headers">Поверх:</div class="headers">
+    <div class="headers">Категорія:</div class="headers">
+    <div class="headers">Дні:</div class="headers">
+    <div class="headers">До/після обіду:</div class="headers">
+    <br>
+    <input type="radio" name="speciality" id="famile-doctor"><label class="filters">Сімейний л.</label>
+    <input type="radio" name="floor" id="_1"><label class="filters">Перший</label>
+    <input type="radio" name="category" id="first"><label class="filters">Перша</label>
+    <input type="radio" name="date" id="weekdays"><label class="filters">Будні дні</label>
+    <input type="radio" name="date-part" id="before"><label class="filters">До обіду</label>
+
+    <br>
+    <input type="radio" name="speciality" id="surgeon"><label class="filters">Хірург</label>
+    <input type="radio" name="floor" id="_2"><label class="filters">Другий</label>
+    <input type="radio" name="category" id="second"><label class="filters">Друга</label>
+    <input type="radio" name="date" id="weekends"><label class="filters">Вихідні дні</label>
+    <input type="radio" name="date-part" id="after"><label class="filters">Після обіду</label>
+    <br>
+    <input type="radio" name="speciality" id="neurologist"><label class="filters">Невропатолог</label>
+    <input type="radio" name="floor" id="_3"><label class="filters">Третій</label>
+    <input type="radio" name="category" id=""><label class="filters">Скинути</label>
+    <input type="radio" name="date" id=""><label class="filters">Скинути</label>
+    <input type="radio" name="date-part" id=""><label class="filters">Скинути</label>
+    <br>
+    <input type="radio" name="speciality" id="dentist"><label class="filters">Стоматолог</label>
+    <input type="radio" name="floor" id="_4"><label class="filters">Четвертий</label>
+    <br>
+    <input type="radio" name="speciality" id="speech-therapist"><label class="filters">Логопед</label>
+    <input type="radio" name="floor" id=""><label class="filters">Скинути</label>
+    <br>
+    <input type="radio" name="speciality" id="otolaryngologist"><label class="filters">ЛОР</label>
+    <br>
+    <input type="radio" name="speciality" id="pediatrist"><label class="filters">Педіатр</label>
+    <br>
+    <input type="radio" name="speciality" id=""><label class="filters">Скинути</label>
+    
+    <table border="1">
+        <tr data-first="1">
+            <th>Спеціальність</th>
+            <th>ПІБ</th>
+            <th>Категорія</th>
+            <th>Кабінету</th>
+            <th>Пн</th>
+            <th>Вт</th>
+            <th>Ср</th>
+            <th>Чт</th>
+            <th>Пт</th>
+            <th>Сб</th>
+            <th>Нд</th>
+        </tr>
+        <tr data-name="Дайнега О.В." data-speciality="famile-doctor" data-category="1" data-floor="3" data-part-of-date="1" data-date="weekdays">
+            <td>Сімейний лікар</td>
+            <td>Дайнега О.В.</td>
+            <td>перша</td>
+            <td>312</td>
+            <td>9.00 - 12.00</td>
+            <td>9.00 - 12.00</td>
+            <td>9.00 - 12.00</td>
+            <td>9.00 - 12.00</td>
+            <td>9.00 - 12.00</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr data-name="Кротова Л.С." data-speciality="famile-doctor" data-category="2" data-floor="3" data-part-of-date="2" data-date="weekends">
+            <td>Сімейний лікар</td>
+            <td>Кротова Л.С.</td>
+            <td>друга</td>
+            <td>315</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>15.00 - 18.00</td>
+            <td>15.00 - 18.00</td>
+        </tr>
+        <tr data-name="Хитрук О.О." data-speciality="famile-doctor" data-category="1" data-floor="3" data-part-of-date="2" data-date="weekdays weekends">
+            <td>Сімейний лікар</td>
+            <td>Хитрук О.О.</td>
+            <td>перша</td>
+            <td>313</td>
+            <td>14.00 - 19.00</td>
+            <td>14.00 - 19.00</td>
+            <td>14.00 - 19.00</td>
+            <td>14.00 - 19.00</td>
+            <td>14.00 - 19.00</td>
+            <td>14.00 - 19.00</td>
+            <td>-</td>
+        </tr>
+        <tr data-name="Скрицький І.В." data-speciality="surgeon" data-category="1" data-floor="2" data-part-of-date="1" data-date="weekdays">
+            <td>Хірург</td>
+            <td>Скрицький І.В.</td>
+            <td>перша</td>
+            <td>213</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr data-name="Зайцев Л.В." data-speciality="surgeon" data-category="2" data-floor="2" data-part-of-date="2" data-date="weekdays weekends">
+            <td>Хірург</td>
+            <td>Зайцев Л.В.</td>
+            <td>друга</td>
+            <td>221</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>14.00 - 18.30</td>
+            <td>14.00 - 18.30</td>
+            <td>14.00 - 18.30</td>
+            <td>14.00 - 18.30</td>
+        </tr>
+        <tr data-name="Коломієць А.П." data-speciality="neurologist" data-category="1" data-floor="2" data-part-of-date="1 2" data-date="weekdays">
+            <td>Невропатолог</td>
+            <td>Коломієць А.П.</td>
+            <td>перша</td>
+            <td>243</td>
+            <td>11.00 - 17.00</td>
+            <td>11.00 - 17.00</td>
+            <td>11.00 - 17.00</td>
+            <td>11.00 - 17.00</td>
+            <td>11.00 - 17.00</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr data-name="Петренко А.В." data-speciality="dentist" data-category="1" data-floor="1" data-part-of-date="1" data-date="weekdays">
+            <td>Стоматолог</td>
+            <td>Петренко А.В.</td>
+            <td>перша</td>
+            <td>105</td>
+            <td>9.00 - 13.30</td>
+            <td>-</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr data-name="Зубренко В.К." data-speciality="dentist" data-category="2" data-floor="1" data-part-of-date="2" data-date="weekends">
+            <td>Стоматолог</td>
+            <td>Зубренко В.К.</td>
+            <td>друга</td>
+            <td>118</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>13.00 - 18.30</td>
+            <td>13.00 - 18.30</td>
+        </tr>
+        <tr data-name="Ябленко К.В." data-speciality="dentist" data-category="1" data-floor="1" data-part-of-date="1" data-date="weekdays weekends">
+            <td>Стоматолог</td>
+            <td>Ябленко К.В.</td>
+            <td>перша</td>
+            <td>106</td>
+            <td>9.00 - 14.00</td>
+            <td>9.00 - 14.00</td>
+            <td>9.00 - 14.00</td>
+            <td>-</td>
+            <td>-</td>
+            <td>9.00 - 14.00</td>
+            <td>9.00 - 14.00</td>
+        </tr>
+        <tr data-name="Войтенко М.В" data-speciality="speech-therapist" data-category="2" data-floor="1" data-part-of-date="1" data-date="weekdays">
+            <td>Логопед</td>
+            <td>Войтенко М.В.</td>
+            <td>друга</td>
+            <td>145</td>
+            <td>9.00 - 13.30</td>
+            <td>-</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr data-name="Вільгаш Н.Р." data-speciality="speech-therapist" data-category="1" data-floor="1" data-part-of-date="2" data-date="weekdays weekends">
+            <td>Логопед</td>
+            <td>Вільгаш Н.Р.</td>
+            <td>перша</td>
+            <td>147</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <td>14.00 - 19.30</td>
+            <td>14.00 - 19.30</td>
+            <td>14.00 - 19.30</td>
+            <td>14.00 - 19.30</td>
+        </tr>
+        <tr data-name="Каплун Г.В." data-speciality="otolaryngologist" data-category="1" data-floor="3" data-part-of-date="1" data-date="weekdays">
+            <td>ЛОР</td>
+            <td>Каплун Г.В.</td>
+            <td>перша</td>
+            <td>326</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>9.00 - 13.30</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+        <tr data-name="Валенко Ш.Н." data-speciality="otolaryngologist" data-category="1" data-floor="3" data-part-of-date="2" data-date="weekdays weekends">
+            <td>ЛОР</td>
+            <td>Валенко Ш.Н.</td>
+            <td>перша</td>
+            <td>321</td>
+            <td>13.00 - 18.00</td>
+            <td>13.00 - 18.00</td>
+            <td>-</td>
+            <td>-</td>
+            <td>13.00 - 18.00</td>
+            <td>13.00 - 18.00</td>
+            <td>13.00 - 18.00</td>
+        </tr>
+        <tr data-name="Зайцева Г.В." data-speciality="pediatrist" data-category="1" data-floor="4" data-part-of-date="1" data-date="weekdays weekends">
+            <td>Педіатр</td>
+            <td>Зайцева Г.В.</td>
+            <td>перша</td>
+            <td>406</td>
+            <td>9.00 - 13.30</td>
+            <td>-</td>
+            <td>9.00 - 13.30</td>
+            <td>-</td>
+            <td>9.00 - 13.30</td>
+            <td>-</td>
+            <td>9.00 - 13.30</td>
+        </tr>
+        <tr data-name="Оганян Г.Н." data-speciality="pediatrist" data-category="2" data-floor="4" data-part-of-date="2" data-date="weekdays">
+            <td>Педіатр</td>
+            <td>Оганян Г.Н.</td>
+            <td>друга</td>
+            <td>410</td>
+            <td>13.00 - 18.00</td>
+            <td>13.00 - 18.00</td>
+            <td>13.00 - 18.00</td>
+            <td>13.00 - 18.00</td>
+            <td>13.00 - 18.00</td>
+            <td>-</td>
+            <td>-</td>
+        </tr>
+    </table>
+    <br><br>
+    
+    <form action="#">
+        <label> Телефон: </label>
+        <input required type="tel" name="telephone" placeholder="+38 (XXX) XXX-XX-XX" pattern="^[\+]\d{2}\s[\(]\d{3}[\)]\s\d{3}[\-]\d{2}[\-]\d{2}$" minlength="19" maxlength="19">
+        <br><br>
+        <label> E-mail: </label>
+        <input required type="email" name="email" placeholder="E-mail">
+        <br><br>
+        <button>Надіслати дані на телефон</button>
+    </form>
+</body>
+</html>
